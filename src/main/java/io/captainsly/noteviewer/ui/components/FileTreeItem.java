@@ -35,17 +35,16 @@ public class FileTreeItem extends TreeItem<File> {
 
 		return isLeaf;
 	}
-	
+
 	private ObservableList<TreeItem<File>> buildChildren(TreeItem<File> treeItem) {
 		File f = treeItem.getValue();
 		if (f != null && f.isDirectory()) {
 			File[] files = f.listFiles();
 			if (files != null) {
 				ObservableList<TreeItem<File>> children = FXCollections.observableArrayList();
-				
+
 				for (File childFile : files)
 					children.add(new FileTreeItem(childFile));
-
 				return children;
 			}
 		}

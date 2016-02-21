@@ -1,6 +1,8 @@
 package io.captainsly.noteviewer.ui;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 
 import org.controlsfx.control.StatusBar;
@@ -22,6 +24,7 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SplitPane;
+import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -40,14 +43,15 @@ public class NoteUi extends Application {
 	private int	I_WIDTH;
 	private int	I_HEIGHT;
 
-	private Stage		stage;
-	private SlidePane	slidePane;
-	private SplitPane	splitPane;
-	private StatusBar	statusBar;
-	private BorderPane	root;
-	private GridPane	grid;
-	private Editor		text;
-	private Label		pathLabel;
+	private Stage			stage;
+	private SlidePane		slidePane;
+	private SplitPane		splitPane;
+	private StatusBar		statusBar;
+	private BorderPane		root;
+	private GridPane		grid;
+	private Editor			text;
+	private Label			pathLabel;
+	private TreeView<File>	fileView;
 
 	@Override
 	public void init() {
@@ -86,7 +90,7 @@ public class NoteUi extends Application {
 		Button showPane = new Button();
 		Scene scene = new Scene(root, I_WIDTH, I_HEIGHT);
 
-		grid.setPadding(new Insets(10, 10, 10, 10));
+		grid.setPadding(new Insets(5, 10, 5, 10));
 		grid.setHgap(10);
 		grid.setVgap(10);
 
@@ -177,10 +181,12 @@ public class NoteUi extends Application {
 		grid.add(pathLabel, 4, 0);
 
 		String path = IniHandler.readKeyString("SYSTEM", "DIRECTORY");
-		TreeView<File> fileView = new TreeView<File>(new FileTreeItem(new File(path)));
+		fileView = new TreeView<File>(new FileTreeItem(new File(path)));
 
+		splitPane.setDividerPosition(0, 0.53);
+		
 		slidePane = new SlidePane(this, fileView);
-
+		
 		fileView.setOnMouseClicked((event) -> {
 			if (event.getButton() != null && event.getButton() == MouseButton.MIDDLE) {
 				String d = text.getText();
@@ -188,18 +194,40 @@ public class NoteUi extends Application {
 				splitPane.getItems().addAll(text, slidePane);
 				text.setText(d);
 				statusBar.setText("Refreshed file tree");
+			} else if (event.getButton() != null && event.getButton() == MouseButton.PRIMARY) {
+				fileView.getSelectionModel().selectedItemProperty().addListener((o, ol, nv) -> {
+					TreeItem<File> selectedItem = (TreeItem<File>) nv;
+					try {
+						FileReader fr = new FileReader(selectedItem.getValue());
+						BufferedReader reader = new BufferedReader(fr);
+						String line = null;
+						StringBuilder br = new StringBuilder();
+						while ((line = reader.readLine()) != null) {
+							br.append(line);
+							br.append("\n");
+						}
+						
+						text.setText(br.toString());
+						
+						reader.close();
+						statusBar.setText("Loaded File: " + selectedItem.getValue().getName());
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				});
 			}
 
-			if (event.getClickCount() > 42) {
+			if (event.getClickCount() >= 42) {
 				statusBar.setText("The Answer to life, the universe, and everything");
 			}
+
 		});
 
 		splitPane.getItems().addAll(text, slidePane);
 
 		stage.setScene(scene);
 		stage.getIcons().addAll(new Image("icon-16.png"), new Image("icon-24.png"), new Image("icon.png"), new Image("icon-96.png"));
-		stage.setTitle("A BETTER Version of Chris' Note program");
+		stage.setTitle("NoteViewer");
 		stage.show();
 	}
 

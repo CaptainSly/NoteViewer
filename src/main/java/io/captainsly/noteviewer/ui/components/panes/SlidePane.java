@@ -8,6 +8,7 @@ import javafx.scene.control.TreeView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
 
 public class SlidePane extends BorderPane {
 
@@ -21,7 +22,10 @@ public class SlidePane extends BorderPane {
 			note.getStatusBar().setText("Closing File Tree");
 		});
 	
-		setCenter(treeView);
+		StackPane stack = new StackPane();
+		stack.getChildren().add(treeView);
+		
+		setCenter(stack);
 		setLeft(btnHide);
 		
 	}
