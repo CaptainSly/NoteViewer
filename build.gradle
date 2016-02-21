@@ -14,12 +14,17 @@ jar {
 
 repositories {
         mavenCentral()
+        maven {
+        	url 'https://oss.sonatype.org/content/repositories/snapshots/'
+        }
 }
 
 dependencies {
     compile "org.apache.commons:commons-lang3:3.4"
     compile "org.ini4j:ini4j:0.5.1"
     compile "org.controlsfx:controlsfx:8.40.10"
+    
+    compile group: "org.fxmisc.richtext", name: "richtextfx", version: "1.0.0-SNAPSHOT"
  
 }
 

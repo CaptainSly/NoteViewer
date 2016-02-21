@@ -6,6 +6,7 @@ import java.io.FileWriter;
 import org.controlsfx.control.StatusBar;
 
 import io.captainsly.noteviewer.ui.components.FileTreeItem;
+import io.captainsly.noteviewer.ui.components.editor.Editor;
 import io.captainsly.noteviewer.ui.components.panes.SlidePane;
 import io.captainsly.noteviewer.utils.IniHandler;
 import javafx.animation.KeyFrame;
@@ -21,7 +22,6 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SplitPane;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TreeView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -46,7 +46,7 @@ public class NoteUi extends Application {
 	private StatusBar	statusBar;
 	private BorderPane	root;
 	private GridPane	grid;
-	private TextArea	text;
+	private Editor		text;
 	private Label		pathLabel;
 
 	@Override
@@ -73,7 +73,7 @@ public class NoteUi extends Application {
 		grid = new GridPane();
 		splitPane = new SplitPane();
 		statusBar = new StatusBar();
-		text = new TextArea();
+		text = new Editor();
 		pathLabel = new Label();
 
 		MenuBar menuBar = new MenuBar();
@@ -181,17 +181,17 @@ public class NoteUi extends Application {
 
 		slidePane = new SlidePane(this, fileView);
 
-		fileView.setOnMouseClicked(new EventHandler<MouseEvent>() {
+		fileView.setOnMouseClicked((event) -> {
+			if (event.getButton() != null && event.getButton() == MouseButton.MIDDLE) {
+				String d = text.getText();
+				splitPane.getItems().removeAll(text, slidePane);
+				splitPane.getItems().addAll(text, slidePane);
+				text.setText(d);
+				statusBar.setText("Refreshed file tree");
+			}
 
-			@Override
-			public void handle(MouseEvent event) {
-				if (event.getButton() != null && event.getButton() == MouseButton.MIDDLE) {
-					String d = text.getText();
-					splitPane.getItems().removeAll(text, slidePane);
-					splitPane.getItems().addAll(text, slidePane);
-					text.setText(d);
-					statusBar.setText("Refreshed file tree");
-				}
+			if (event.getClickCount() > 42) {
+				statusBar.setText("The Answer to life, the universe, and everything");
 			}
 		});
 
@@ -228,8 +228,8 @@ public class NoteUi extends Application {
 		return stage;
 	}
 
-	public void setText(String text) {
-		this.text.setText(text);
+	public void setText(String dtext) {
+		text.setText(dtext);
 	}
 
 	public void setLabelText(String text) {
