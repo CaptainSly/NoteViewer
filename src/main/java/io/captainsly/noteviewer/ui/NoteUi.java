@@ -8,6 +8,8 @@ import java.io.FileWriter;
 import org.controlsfx.control.StatusBar;
 
 import io.captainsly.noteviewer.ui.components.FileTreeItem;
+import io.captainsly.noteviewer.ui.components.dialogs.AboutDialog;
+import io.captainsly.noteviewer.ui.components.dialogs.SettingsDialog;
 import io.captainsly.noteviewer.ui.components.editor.Editor;
 import io.captainsly.noteviewer.ui.components.panes.SlidePane;
 import io.captainsly.noteviewer.utils.IniHandler;
@@ -15,6 +17,7 @@ import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.application.Application;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -28,6 +31,9 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
@@ -40,9 +46,11 @@ import javafx.util.Duration;
 
 public class NoteUi extends Application {
 
+	public static final String VERSION = "1.0";
+
 	private int	I_WIDTH;
 	private int	I_HEIGHT;
-
+	
 	private Stage			stage;
 	private SlidePane		slidePane;
 	private SplitPane		splitPane;
@@ -52,6 +60,7 @@ public class NoteUi extends Application {
 	private Editor			text;
 	private Label			pathLabel;
 	private TreeView<File>	fileView;
+	private AboutDialog		about;
 
 	@Override
 	public void init() {
@@ -79,6 +88,7 @@ public class NoteUi extends Application {
 		statusBar = new StatusBar();
 		text = new Editor();
 		pathLabel = new Label();
+		about = new AboutDialog();
 
 		MenuBar menuBar = new MenuBar();
 		Menu menuSettings = new Menu();
@@ -145,29 +155,48 @@ public class NoteUi extends Application {
 
 		});
 
-		itemSave.setOnAction(evt -> {
+		itemSave.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN));
 
-			String d = text.getText();
-			FileChooser chooser = new FileChooser();
-			ExtensionFilter extFilter = new ExtensionFilter("Text Files (*.txt)", "*.txt");
-			chooser.getExtensionFilters().add(extFilter);
-			try {
-				chooser.setInitialDirectory(new File(IniHandler.readKeyString("SYSTEM", "DIRECTORY")));
-				File file = chooser.showSaveDialog(getStage());
-				FileWriter writer = new FileWriter(file + ".txt");
-				writer.write(d);
-				writer.close();
-				statusBar.setText("Saved file at location: " + file.getAbsolutePath());
-			} catch (Exception e) {
-				e.printStackTrace();
-				statusBar.setText("It seems that saving has failed, or you may have closed the dialog box.");
+		itemSave.setOnAction(new EventHandler<ActionEvent>() {
+
+			@Override
+			public void handle(ActionEvent event) {
+				String d = text.getText();
+				FileChooser chooser = new FileChooser();
+				ExtensionFilter extFilter = new ExtensionFilter("Text Files (*.txt)", "*.txt");
+				chooser.getExtensionFilters().add(extFilter);
+				try {
+					chooser.setInitialDirectory(new File(IniHandler.readKeyString("SYSTEM", "DIRECTORY")));
+					File file = chooser.showSaveDialog(getStage());
+					if (file.getPath().toLowerCase().endsWith(".txt")) {
+						FileWriter writer = new FileWriter(file);
+						writer.write(d);
+						writer.close();
+						statusBar.setText("Saved file at location: " + file.getAbsolutePath());
+					} else {
+						FileWriter writer = new FileWriter(file + ".txt");
+						writer.write(d);
+						writer.close();
+						statusBar.setText("Saved file at location: " + file.getAbsolutePath());
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+					statusBar.setText("It seems that saving has failed, or you may have closed the dialog box.");
+				}
 			}
-		}
 
-		);
+		});
 
 		itemExit.setOnAction(evt -> {
 			stage.close();
+		});
+
+		itemAbout.setOnAction(evt -> {
+			about.showAndWait();
+		});
+
+		itemSettings.setOnAction(evt -> {
+			new SettingsDialog().show(this);
 		});
 
 		showPane.setGraphic(new ImageView(new Image("open.png")));
@@ -184,9 +213,9 @@ public class NoteUi extends Application {
 		fileView = new TreeView<File>(new FileTreeItem(new File(path)));
 
 		splitPane.setDividerPosition(0, 0.53);
-		
+
 		slidePane = new SlidePane(this, fileView);
-		
+
 		fileView.setOnMouseClicked((event) -> {
 			if (event.getButton() != null && event.getButton() == MouseButton.MIDDLE) {
 				String d = text.getText();
@@ -196,23 +225,26 @@ public class NoteUi extends Application {
 				statusBar.setText("Refreshed file tree");
 			} else if (event.getButton() != null && event.getButton() == MouseButton.PRIMARY) {
 				fileView.getSelectionModel().selectedItemProperty().addListener((o, ol, nv) -> {
+					
 					TreeItem<File> selectedItem = (TreeItem<File>) nv;
-					try {
-						FileReader fr = new FileReader(selectedItem.getValue());
-						BufferedReader reader = new BufferedReader(fr);
-						String line = null;
-						StringBuilder br = new StringBuilder();
-						while ((line = reader.readLine()) != null) {
-							br.append(line);
-							br.append("\n");
+					if (!selectedItem.getValue().isDirectory()) {
+						try {
+							FileReader fr = new FileReader(selectedItem.getValue());
+							BufferedReader reader = new BufferedReader(fr);
+							String line = null;
+							StringBuilder br = new StringBuilder();
+							while ((line = reader.readLine()) != null) {
+								br.append(line);
+								br.append("\n");
+							}
+
+							text.setText(br.toString());
+
+							reader.close();
+							statusBar.setText("Loaded File: " + selectedItem.getValue().getName());
+						} catch (Exception e) {
+							e.printStackTrace();
 						}
-						
-						text.setText(br.toString());
-						
-						reader.close();
-						statusBar.setText("Loaded File: " + selectedItem.getValue().getName());
-					} catch (Exception e) {
-						e.printStackTrace();
 					}
 				});
 			}

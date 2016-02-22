@@ -37,6 +37,8 @@ import javafx.scene.text.TextAlignment;
 
 public class Editor extends BorderPane {
 
+	int i = 1;
+	
 	private final StyledTextArea<ParStyle, TextStyle> area = AreaFactory.<ParStyle, TextStyle>styledTextArea(ParStyle.EMPTY, (paragraph, style) -> paragraph.setStyle(style.toCss()), TextStyle.EMPTY.updateFontSize(12).updateFontFamily("Serif").updateTextColor(Color.BLACK), (text, style) -> text.setStyle(style.toCss()));
 
 	private final SuspendableNo updatingToolbar = new SuspendableNo();
@@ -97,8 +99,8 @@ public class Editor extends BorderPane {
 		alignCenterBtn.setGraphic(addImage("alignCenter-16"));
 		alignRightBtn.setGraphic(addImage("alignRight-16"));
 		alignJustifyBtn.setGraphic(addImage("alignJustify-16"));
-		
-		
+			
+			
 		BooleanBinding selectionEmpty = new BooleanBinding() {
 			{
 				bind(area.selectionProperty());

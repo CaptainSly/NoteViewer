@@ -1,15 +1,25 @@
 apply plugin: 'java'
 apply plugin: 'eclipse'
 
+apply from: "http://dl.bintray.com/content/shemnon/javafx-gradle/8.1.1/javafx.plugin"
+
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 version = '1.0'
-jar {
-    manifest {
-        attributes 'Implementation-Title': 'NoteViewer',
-                   'Implementation-Version': version,
-                   'Main-Class': 'io.captainsly.noteviewer.NoteViewer'
-    }
+
+javafx {
+	appID 'NoteViewer'
+	appName 'Note Viewer'
+	mainClass 'io.captainsly.noteviewer.NoteViewer'
+	
+	category = "Test"
+	copyright = "Copyright (c) 2016 CaptainSly"
+	description = "NoteViewer is a note taking utility"
+	licenseType = "Apache 2.0"
+	vendor = "CaptainSly"
+	installSystemWide = false
+	menu = false
+	shortcut = false
 }
 
 repositories {
@@ -25,7 +35,7 @@ dependencies {
     compile "org.controlsfx:controlsfx:8.40.10"
     
     compile group: "org.fxmisc.richtext", name: "richtextfx", version: "1.0.0-SNAPSHOT"
- 
+ 	compile group: "org.fxmisc.livedirs", name: "livedirsfx", version: "1.0.0-SNAPSHOT"
 }
 
 
@@ -36,3 +46,4 @@ uploadArchives {
        }
     }
 }
+
