@@ -16,6 +16,10 @@ Total Fucks Given: -4
 
 ----------------------------------------------------
 
+# Releases
+
+Current Release is a tech [demo](https://github.com/CaptainSly/NoteViewer/releases). 
+
 # Dependencies
 
 NoteViewer utilizes the following dependencies
