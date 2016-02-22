@@ -42,11 +42,7 @@ NoteViewer utilizes the following dependencies
 
 # TODO/Planned
 	TODO
-
-# Release
-
-	TODO
-
+	
 # Usage
 
 If NoteViewer fails to open a file, it could be that it's either a directory or not a text document. Make sure your files are named correctly, this doesn't mean that an incorrectly named file won't open, but it lessens the chance of a crash.
