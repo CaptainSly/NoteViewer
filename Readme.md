@@ -48,7 +48,7 @@ NoteViewer utilizes the following dependencies
 If NoteViewer fails to open a file, it could be that it's either a directory or not a text document. Make sure your files are named correctly, this doesn't mean that an incorrectly named file won't open, but it lessens the chance of a crash.
 
 # Building
-NoteViewer uses gradle as the build tool. Use `gradle build` to buid NoteViewer, results can be found at `build/distributions/NoteViewer/app/NoteViewer-yz.jar` reason for it to be in such a long path is that for the forseeable future, the NoteViewer.exe file that is created doesn't launch the jar. So running the jar itself will run the program.
+NoteViewer uses gradle as the build tool. Use `gradle build` to buid NoteViewer, results can be found at `build/distributions/NoteViewer`, the app is fixed, so you *should* be able to use it to launch the program.
 
 # Possible Fixes
 A way to save formatted work would be to save the css document that is created along with the actual file, and not allow it to be visible in the file tree. Then when opening the text document, opens the css file along with it and apply the style. Only problem would be actually gathering the data to save the document. Might be impossible.

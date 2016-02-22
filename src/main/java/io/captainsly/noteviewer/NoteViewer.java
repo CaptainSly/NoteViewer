@@ -12,7 +12,10 @@ public class NoteViewer {
 	private static final File file = new File("config.ini");
 	
 	public static void main(String[] args) {
-		if (!file.exists()) createIni();
+		if (!file.exists()) {
+			createIni();
+			Application.launch(NoteUi.class, args);
+		}
 		else Application.launch(NoteUi.class, args);
 	}
 	
