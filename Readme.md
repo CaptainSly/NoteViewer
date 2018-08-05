@@ -14,6 +14,9 @@ Total Number of Classes: 10
 
 Total Fucks Given: -4
 
+
+# This is the end all and be all on this project. It is finished as is. And will not be updated
+
 ----------------------------------------------------
 
 # Releases
